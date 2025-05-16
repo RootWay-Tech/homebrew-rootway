@@ -21,28 +21,36 @@ class Rootway < Formula
 
    def post_install
   venv_dir = var/"rootway/venv"
+  pip_install_log = var/"log/rootway_pip_install.log"
+  wireguard_log = var/"log/rootway_wireguard_setup.log"
+  python_bin = Formula["python@3.12"].opt_libexec/"bin/python3"
 
-  # Czyścimy katalog rootway, aby mieć świeże środowisko
-  if File.exist?(var/"rootway")
-    system "rm", "-rf", var/"rootway"
+  # Tworzymy katalogi jeśli ich brak
+  (var/"rootway").mkpath
+  (var/"log").mkpath
+
+  # Sprawdź, czy venv już istnieje
+  unless venv_dir.exist?
+    ohai "Tworzenie środowiska virtualenv w #{venv_dir}..."
+    system python_bin, "-m", "venv", venv_dir
+  else
+    ohai "Środowisko virtualenv już istnieje w #{venv_dir} - pomijam tworzenie."
   end
 
-  # Tworzymy katalog rootway i venv od nowa
-  (var/"rootway").mkpath
-
-  python_bin = Formula["python@3.12"].opt_bin/"python3"
-
-  # Tworzenie środowiska virtualenv
-  system python_bin, "-m", "venv", venv_dir
-
   # Instalacja zależności Pythona z logowaniem
-  pip_install_log = var/"log/rootway_pip_install.log"
-  system "#{venv_dir}/bin/pip", "install", "--log", pip_install_log, "-r", opt_prefix/"requirements.txt"
+  ohai "Instalacja zależności Pythona z requirements.txt..."
+  pip_bin = venv_dir/"bin/pip"
+  if !system "#{pip_bin}", "install", "--log", pip_install_log, "-r", opt_prefix/"requirements.txt"
+    opoo "Instalacja zależności Pythona zakończona błędem. Sprawdź log: #{pip_install_log}"
+  end
 
   # Automatyczna konfiguracja WireGuard z logowaniem
-  wireguard_log = var/"log/rootway_wireguard_setup.log"
-  system "sudo", "python3", opt_prefix/"wireguard_setup.py", ">", wireguard_log, "2>&1"
+  ohai "Konfiguracja WireGuard..."
+  if !system "sudo", python_bin, opt_prefix/"wireguard_setup.py", ">", wireguard_log, "2>&1"
+    opoo "Konfiguracja WireGuard zakończona błędem. Sprawdź log: #{wireguard_log}"
+  end
 end
+
 
 
   service do
