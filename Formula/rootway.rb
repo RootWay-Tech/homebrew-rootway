@@ -12,8 +12,8 @@ class Rootway < Formula
   depends_on "wireguard-tools"
 
   resource "flask" do
-  url "https://files.pythonhosted.org/packages/2f/32/81eacfa4ecac52fd2e86cb748abca9d5793f2220f272f3f3b80b8a08a984/Flask-3.0.2.tar.gz"
-  sha256 "4b84706f48b9c6f4f35746cbb262b0cce56176db72865205f6708a489296cc3a"
+  url "https://files.pythonhosted.org/packages/3f/e0/a89e8120faea1edbfca1a9b171cff7f2bf62ec860bbafcb2c2387c0317be/flask-3.0.2.tar.gz"
+  sha256 "822c03f4b799204250a7ee84b1eddc40665395333973dfb9deebfe425fefcb7d"
 end
 
 
