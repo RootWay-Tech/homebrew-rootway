@@ -20,19 +20,25 @@ class Rootway < Formula
   end
 
   def post_install
-    venv_dir = var/"rootway/venv"
+  venv_dir = var/"rootway/venv"
+  log_dir = var/"log"
 
-    # Tworzenie środowiska virtualenv
-    system Formula["python@3.12"].opt_bin/"python3", "-m", "venv", venv_dir
+  # Tworzenie katalogów
+  mkdir_p venv_dir
+  mkdir_p log_dir
 
-    # Instalacja zależności Pythona z logowaniem
-    pip_install_log = var/"log/rootway_pip_install.log"
-    system "#{venv_dir}/bin/pip", "install", "--log", pip_install_log, "-r", opt_prefix/"requirements.txt"
+  # Tworzenie środowiska virtualenv
+  system Formula["python@3.12"].opt_bin/"python3", "-m", "venv", venv_dir
 
-    # Automatyczna konfiguracja WireGuard z logowaniem
-    wireguard_log = var/"log/rootway_wireguard_setup.log"
-    system "sudo", "python3", opt_prefix/"wireguard_setup.py", ">", wireguard_log, "2>&1"
-  end
+  # Instalacja zależności Pythona z logowaniem
+  pip_install_log = log_dir/"rootway_pip_install.log"
+  system "#{venv_dir}/bin/pip", "install", "--log", pip_install_log, "-r", opt_prefix/"requirements.txt"
+
+  # Automatyczna konfiguracja WireGuard (bez przekierowania, zapis logu alternatywnie)
+  wireguard_log = log_dir/"rootway_wireguard_setup.log"
+  system "/bin/bash", "-c", "sudo python3 #{opt_prefix}/wireguard_setup.py > #{wireguard_log} 2>&1"
+end
+
 
   service do
     run [var/"rootway/venv/bin/python3", opt_prefix/"main.py"]
