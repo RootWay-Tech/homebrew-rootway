@@ -2,7 +2,7 @@ class Rootway < Formula
   desc "Rootway Agent - monitoring serwera"
   homepage "https://github.com/RootWay-Tech/homebrew-rootway"
   url "https://github.com/RootWay-Tech/homebrew-rootway/releases/download/v1.0.0/rootway-agent.zip"
-  sha256 "61895B168E1E8BB883A647366A69735A4BA95B490A68F912DA386347E0152AB7"
+  sha256 "54AAC8C59ED47E704AD40E5A65C4DED77AEA533FB5E13776B9C78CA5C22B3CC7"
   license "MIT"
   version "1.0.0"
 
