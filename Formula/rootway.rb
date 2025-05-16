@@ -19,24 +19,29 @@ class Rootway < Formula
     (prefix/"templates").mkpath
   end
 
-  def post_install
+   def post_install
   venv_dir = var/"rootway/venv"
-  log_dir = var/"log"
 
-  # Tworzenie katalogów
-  mkdir_p venv_dir
-  mkdir_p log_dir
+  # Czyścimy katalog rootway, aby mieć świeże środowisko
+  if File.exist?(var/"rootway")
+    system "rm", "-rf", var/"rootway"
+  end
+
+  # Tworzymy katalog rootway i venv od nowa
+  (var/"rootway").mkpath
+
+  python_bin = Formula["python@3.12"].opt_bin/"python3"
 
   # Tworzenie środowiska virtualenv
-  system Formula["python@3.12"].opt_bin/"python3", "-m", "venv", venv_dir
+  system python_bin, "-m", "venv", venv_dir
 
   # Instalacja zależności Pythona z logowaniem
-  pip_install_log = log_dir/"rootway_pip_install.log"
+  pip_install_log = var/"log/rootway_pip_install.log"
   system "#{venv_dir}/bin/pip", "install", "--log", pip_install_log, "-r", opt_prefix/"requirements.txt"
 
-  # Automatyczna konfiguracja WireGuard (bez przekierowania, zapis logu alternatywnie)
-  wireguard_log = log_dir/"rootway_wireguard_setup.log"
-  system "/bin/bash", "-c", "sudo python3 #{opt_prefix}/wireguard_setup.py > #{wireguard_log} 2>&1"
+  # Automatyczna konfiguracja WireGuard z logowaniem
+  wireguard_log = var/"log/rootway_wireguard_setup.log"
+  system "sudo", "python3", opt_prefix/"wireguard_setup.py", ">", wireguard_log, "2>&1"
 end
 
 
